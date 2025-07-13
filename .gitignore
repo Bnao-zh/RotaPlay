@@ -1,0 +1,24 @@
+# Ignore Gradle caches and generated files
+.gradle/
+build/
+
+# Ignore IntelliJ IDEA files
+.idea/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore log files
+*.log
+
+# Ignore backup files
+*~
+
+# Ignore temporary files
+*.tmp
+
+# app
+app/build/
+app/release/
+app/src/main/assets/index.html
