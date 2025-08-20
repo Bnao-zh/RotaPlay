@@ -18,15 +18,15 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 
-abstract class MainActivity : AppCompatActivity(), SensorEventListener {
+class MainActivity : AppCompatActivity(), SensorEventListener {
     private lateinit var myWebView: WebView
     private var mFilePathCallback: ValueCallback<Array<Uri>>? = null
     private var mCapturedImageUri: Uri? = null
     private val FILE_CHOOSER_REQUEST_CODE = 100
     // 尝试传感器
-//    private lateinit var sensorManager: SensorManager
-//    private var gravitySensor: Sensor? = null
-//    private var gravityValues = FloatArray(3)
+    private lateinit var sensorManager: SensorManager
+    private var gravitySensor: Sensor? = null
+    private var gravityValues = FloatArray(3)
 
     @SuppressLint("InlinedApi")
     @RequiresApi(Build.VERSION_CODES.O)
@@ -44,14 +44,14 @@ abstract class MainActivity : AppCompatActivity(), SensorEventListener {
         ActivityCompat.requestPermissions(this, permissions, 1)
 
         // 初始化传感器管理器
-//        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-//        gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
 
         myWebView = findViewById(R.id.webview)
         setupWebView()
         myWebView.loadUrl("file:///android_asset/index.html")
-        // 添加 JavaScript 接口
-//        myWebView.addJavascriptInterface(this, "Android")
+        //添加 JavaScript 接口
+        myWebView.addJavascriptInterface(this, "Android")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -60,11 +60,11 @@ abstract class MainActivity : AppCompatActivity(), SensorEventListener {
         val webSettings: WebSettings = myWebView.settings
         webSettings.javaScriptEnabled = true
         myWebView.webViewClient = object : WebViewClient() {
-//            override fun onPageFinished(view: WebView?, url: String?) {
-//                super.onPageFinished(view, url)
-//                // 在页面加载完成后调用 JavaScript 方法
-//                myWebView.evaluateJavascript("javascript:initializeApp()", null)
-//            }
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+                // 在页面加载完成后调用 JavaScript 方法
+                myWebView.evaluateJavascript("javascript:initializeApp()", null)
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -95,32 +95,32 @@ abstract class MainActivity : AppCompatActivity(), SensorEventListener {
         })
     }
 
-//    @JavascriptInterface
-//    fun getGravityValues(): String {
-//        return "${gravityValues[0]},${gravityValues[1]},${gravityValues[2]}"
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//        gravitySensor?.also { sensor ->
-//            sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
-//        }
-//    }
-//
-//    override fun onPause() {
-//        super.onPause()
-//        sensorManager.unregisterListener(this)
-//    }
-//
-//    override fun onSensorChanged(event: SensorEvent) {
-//        if (event.sensor.type == Sensor.TYPE_GRAVITY) {
-//            gravityValues = event.values.copyOf()
-//        }
-//    }
-//
-//    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-//        // 不需要实现
-//    }
+    @JavascriptInterface
+    fun getGravityValues(): String {
+        return "${gravityValues[0]},${gravityValues[1]},${gravityValues[2]}"
+    }
+
+    override fun onResume() {
+        super.onResume()
+        gravitySensor?.also { sensor ->
+            sensorManager.registerListener(this, sensor, 5000,0)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sensorManager.unregisterListener(this)
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        if (event.sensor.type == Sensor.TYPE_GRAVITY) {
+            gravityValues = event.values.copyOf()
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // 不需要实现
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
